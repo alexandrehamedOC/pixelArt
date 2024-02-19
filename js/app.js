@@ -1,165 +1,152 @@
-
-/******** RECUPERATION DES ELEMNTS HTML **********/
-
-/** Récupérer l'élément body */
-const bodyElement = document.querySelector('body');
-
-/**Récupère l'élément formulaire de la page HTML */
-const formulaireElement = document.querySelector('.configuration');
-
-/** Récupère l'élément Invader */
-const invaderContainer = document.querySelector('#invader');
+/***objet App */
 
 
-/*************** CREATION DES ELEMENTS HTML ************/
-/** Créé l'élément header */
-const headerElement = document.createElement('header');
+const app = {
+  numberCellules: 64,
+  pixelSize: 15,
+  widthInvaderContainer: 120 + "px",
+  colorSelect: "defaultPixel",
+  classStyleDefault: "defaultPixel",
+  classStyleSelected: this.classStyleDefault,
+  initHeader() {
+    /** Récupérer l'élément body */
+    const bodyElement = document.querySelector('body');
 
-/** Element input taille de la grid */
-const inputElementGridSize = document.createElement('input');
-inputElementGridSize.placeholder = "Taille de la grille";
-inputElementGridSize.setAttribute('type', 'number');
-// inputElementGridSize.setAttribute('min', '8');
-// inputElementGridSize.setAttribute('max', '20');
+    /** Créé l'élément header */
+    const headerElement = document.createElement('header');
 
-/** Element input nombre de pixel grid */
-const inputElementPixel = document.createElement('input');
-inputElementPixel.placeholder = "Taille des pixels";
-inputElementPixel.setAttribute('type', 'number');
-// inputElementPixel.setAttribute('min', '15');
-// inputElementPixel.setAttribute('max', '35');
+    /**Récupère l'élément formulaire de la page HTML */
+    const formulaireElement = document.querySelector('.configuration');
+    /** Insert le header dans la page */
+    bodyElement.prepend(headerElement);
 
-/** Element button submit */
-const buttonElement =  document.createElement('button');
-buttonElement.innerText = "Valider";
+    /** Insert le formulaire dans le header */
+    headerElement.append(formulaireElement);
 
-/** Element div container de invader */
-const divElementContainer = document.createElement('div'); 
-divElementContainer.classList.add('container');
+    /** Insert les éléments input et button dans le formulaire */
+    const inputElementGridSize = this.createInputElement("Taille de la grille");
+    const inputElementPixel = this.createInputElement("Taille des pixels");
 
-/** Créé l'élément <ul> colorPicker */
-const colorPickerElement = document.createElement('ul');
-colorPickerElement.classList.add('colorPickerContainer');
+    /** Element button submit */
+    const buttonElement =  document.createElement('button');
+    buttonElement.setAttribute('type', 'submit');
+    buttonElement.innerText = "Valider";
 
+    formulaireElement.append(inputElementGridSize);
+    formulaireElement.append(inputElementPixel);
 
-/*********** FUNCTIONS  *********/
-/** Création de la cellule */
-function pixelElement(size,classStyle ) {
-  const pixelElement = document.createElement('div');
-  pixelElement.style.height = size +"px";
-  pixelElement.style.width = size +"px";
-  pixelElement.classList.add(classStyle);
-  return pixelElement;
-}
+    formulaireElement.append(buttonElement);
 
-/** Injection des cellules */
-function injectCells(numberCellules, pixelSize) {
-  for(let i = 0; i < numberCellules; i++) {
-    const elementHTML = pixelElement(pixelSize,'defaultPixel');
-    elementHTML.addEventListener('click', changeColorHandler);
-    invaderContainer.append(elementHTML);
-  };
-}
+    formulaireElement.addEventListener('submit', app.submitFormHandler.bind(app));
+  },
+  initMain() {
+    /** Element div container de invader */
+    const divElementContainer = document.createElement('div'); 
+    divElementContainer.classList.add('container');
+    
+    const scriptTag = document.querySelector('script');
 
+    /** Insert le container dans la page */
+    scriptTag.insertAdjacentElement('beforebegin',divElementContainer);
+  
+    /** Récupère l'élément Invader */
+    const invaderContainer = document.querySelector('#invader');
+  
+    /** Insert la <div> #invader dans la container */
+    divElementContainer.append(invaderContainer);
+      
+    /** Créé l'élément <ul> colorPicker */
+    const ulElementBuilds = this.createUlElement();
 
-/*********** EVENTS **************/
+    /** Injecter l'élément <ul> dans le DOM */
+    divElementContainer.insertAdjacentElement('afterend', ulElementBuilds);
+    
+    /** Crée les <li> et les injecte dans le <ul> */
+    this.createAndInjectLiElement(ulElementBuilds);
+  },
+  submitFormHandler(event) {
+    const invaderContainer = document.querySelector('#invader');
 
-/** Sélectionner la couleur */
-function choiceColorHandler (event){
-  classStyleSelected = event.target.className; 
-}
+    event.preventDefault();
+    const gridSize =  Number(event.target[0].value);
+    this.numberCellules = gridSize * gridSize;
+    this.pixelSize = Number(event.target[1].value);
+    invaderContainer.innerHTML = "";
+  
+    this.setGridWidth();
+    this.injectCells();
+  },
+  createUlElement() {
+    const colorPickerElement = document.createElement('ul');
+    colorPickerElement.classList.add('colorPickerContainer');
+    return colorPickerElement;
+  },
+  createAndInjectLiElement(ulElement) {
+    const NUMBER_COLOR = 4;
+    for(let i = 0; i < NUMBER_COLOR; i++) {
+      const colorElement = document.createElement('li');
+    
+      colorElement.classList.add(`color${i}`);
+      colorElement.addEventListener('click', this.choiceColorHandler.bind(this));
+      ulElement.append(colorElement);
+    };
+  },
+  pixelElement(size,classStyle ) {
+    const pixelElement = document.createElement('div');
+    pixelElement.style.height = size + "px";
+    pixelElement.style.width = size + "px";
+    pixelElement.classList.add(classStyle);
+    return pixelElement;
+  },
+  /** Injection des cellules */
+  injectCells() {
+    const invaderContainer = document.getElementById('invader'); 
 
-/** Changer la couleur au click */
-// function changeColorHandler (event){
-//   const getCurrentColor = event.target.className;
-//   console.log(getCurrentColor);
+    for(let i = 0; i < this.numberCellules; i++) {
+      const elementHTML = this.pixelElement(this.pixelSize,this.classStyleDefault);
 
-//     console.log(event.target.className)
-//     if(getCurrentColor === "defaultPixel"){
-//         event.target.className="blackPixel";
-//     }
-//     else{
-//         event.target.className="defaultPixel";
-//     }
-// }
-function changeColorHandler (event){
-  const listOfClasses = event.target.classList;
-  const getCurrentColor = event.target.className;
-  if(listOfClasses.length > 1){
-      event.target.className = classStyleDefault;
-      event.target.classList.add(classStyleSelected);
-    }
-    else{
-      event.target.classList.add(classStyleSelected);
-  };
-}
+      elementHTML.addEventListener('click', this.changeColorHandler.bind(this));
 
-/** Récupère les informations à la validation du formulaire */
-function submitFormHandler (event){
-  event.preventDefault();
-  numberCellules = Number(event.target[0].value) * Number(event.target[0].value);
-  pixelSize = Number(event.target[1].value);
-  invaderContainer.innerHTML ="";
-  setGridWidth(numberCellules, pixelSize);
-  injectCells(numberCellules, pixelSize);
-}
+      invaderContainer.append(elementHTML);
+    };
+  },
+  /** Donne une largeur à la grille en fonction du nombre de cellules et de leur taille */
+  setGridWidth() {
+    const invaderContainer = document.getElementById('invader');
 
-/** Donne une largeur à la grille en fonction du nombre de cellules et de leur taille */
-function setGridWidth (numberCellules, pixelSize){
-  widthInvaderContainer = Math.sqrt(numberCellules) * pixelSize;
-  invaderContainer.style.width = `${widthInvaderContainer}px`;
-}
+    this.widthInvaderContainer = Math.sqrt(this.numberCellules) * this.pixelSize;
 
-
-/************ CODE ***********/
-let numberCellules = 64;
-let pixelSize = 15;
-let widthInvaderContainer = 120 + "px";
-let colorSelect ="defaultPixel";
-
-let classStyleDefault ="defaultPixel";
-let classStyleSelected = classStyleDefault;
-
-
-/** Insert le header dans la page */
-bodyElement.prepend(headerElement);
-
-/** Insert le formulaire dans le header */
-headerElement.append(formulaireElement);
-
-/** Insert les éléments input et button dans le formulaire */
-formulaireElement.append(inputElementGridSize);
-formulaireElement.append(inputElementPixel);
-formulaireElement.append(buttonElement);
-
-formulaireElement.addEventListener('submit', submitFormHandler);
-
-/** Insert le container dans la page */
-headerElement.insertAdjacentElement('afterend',divElementContainer);
-
-/** Insert la <div> #invader dans la container */
-divElementContainer.append(invaderContainer);
-
-
-/****** Création de la grille */
-/** Injection des cellules */
-injectCells(numberCellules, pixelSize);
-
-
-/***** Création des bouttons  */
-/** Injecter l'élément <ul> dans le DOM */
-divElementContainer.insertAdjacentElement('afterend', colorPickerElement);
-
-/** Créé les <li> color de l'élément <ul> */
-const NUMBER_COLOR = 4;
-for(let i = 0; i < NUMBER_COLOR; i++) {
-  const colorElement = document.createElement('li');
-
-  colorElement.classList.add(`color${i}`);
-  colorElement.addEventListener('click', choiceColorHandler);
-  colorPickerElement.append(colorElement);
+    invaderContainer.style.width = `${this.widthInvaderContainer}px`;
+  },
+  /** Crée un élement input de type number avec un placeholder */
+  createInputElement(inputPlaceholder) {
+    const inputElement = document.createElement('input');
+    inputElement.placeholder = inputPlaceholder;
+    inputElement.setAttribute('type', 'number');
+  
+    return inputElement;
+  },
+   changeColorHandler(event) {
+    const listOfClasses = event.target.classList;
+    console.log(listOfClasses)
+    // const getCurrentColor = event.target.className;
+  
+    if(listOfClasses.length > 1) {
+        event.target.className = this.classStyleDefault;
+        event.target.classList.add(this.classStyleSelected);
+    } else {
+        event.target.classList.add(this.classStyleSelected);
+    };
+  },
+  choiceColorHandler(event) {
+    this.classStyleSelected = event.target.className; 
+  },
+  init() {
+    this.initHeader();
+    this.initMain();
+    this.setGridWidth();
+    this.injectCells();
+  }
 };
 
-
-
-
+window.addEventListener('DOMContentLoaded', app.init());
