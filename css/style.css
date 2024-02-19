@@ -1,0 +1,46 @@
+/*****   VARIABLES   *****/
+:root {
+  --header-bcg: #3148AD;
+  --btn-bcg: #9B68E4;
+  --main-bcg: #695ACE;
+  --default-bcg-pixel: #D2DAE2;
+  --default-border-pixel: #808E9B;
+  --bcg-pixel-one: #485460;
+  --border-pixel-one: #29333B;
+  --bcg-pixel-two: #79EA83;
+  --border-pixel-two: #6ACF73;
+  --bcg-pixel-three: #FBC048;
+  --border-pixel-three: #F7A835;
+}
+
+
+*, *::after,  *::before {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+header {
+  height: 20vh;
+  width: 100vw;
+  background-color: var(--header-bcg);
+}
+
+form {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: space-between;
+  align-items: center;
+}
+
+
+
+
+
+/*** CLASS */
+.defaultPixel{
+    background-color: var(--default-bcg-pixel);
+    border: solid 1px var(--default-border-pixel);
+}
