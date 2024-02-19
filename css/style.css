@@ -73,6 +73,7 @@ button {
   border: none;
   background-color: var(--btn-bcg);
   color: var(--text-btn);
+  cursor: pointer;
 }
 
 .container {
@@ -106,3 +107,47 @@ button {
     background-color: var(--bcg-pixel-one);
     border: solid 1px var(--border-pixel-one);
 }
+
+
+/** CSS color picker */
+.colorPickerContainer{
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  z-index: 10;
+  display:flex;
+  flex-direction:row;
+  background-color: rgb(29, 29, 29,0.4) ;
+  border-radius: 10px 0 0 0;
+
+}
+.colorPickerContainer li {
+  list-style: none;
+  width: 30px;
+  height: 30px;
+  border-radius : 50%;
+  border : solid 3px black;
+  margin: 10px;
+  transition: transform 500ms; 
+}
+
+.colorPickerContainer li:hover {
+  transform: scale(1.5);
+  cursor: pointer;
+}
+
+/**colorPicket Items class*/
+
+.color0{
+  background-color:#d1dae2;
+}
+.color1{
+  background-color: #485460;
+}
+.color2{
+  background-color: #fbc049;
+}
+.color3{
+  background-color: #7AEA83;
+}
+
